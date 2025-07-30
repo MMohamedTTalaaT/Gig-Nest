@@ -36,6 +36,7 @@
     <div class="logo-container">
       <div class="user-info">Email: <span id="user-email"></span></div>
     </div>
+    
 
   </div>
 
@@ -113,12 +114,11 @@
     ];
 
     const WEB_DEV_KEYWORDS = [
-      'marketing', 'marketer', 'digital marketing', 'seo',
-      'sem', 'smm', 'content marketing', 'email marketing',
-      'affiliate marketing', 'influencer', 'campaign', 'ads',
-      'facebook ads', 'google ads', 'instagram ads', 'branding',
-      'brand', 'copywriting', 'social media', 'promotion',
-      'growth hacking', 'funnels', 'conversion', 'analytics'
+      'sfx', 'sound effects', 'sound designer', 'foley artist', 'audio editor',
+      'sound mixing', 'sound design', 'ambient sound', 'cinematic sound',
+      'sound engineer', 'fx audio', 'audio post-production', 'foley', 'field recording',
+      'reverb', 'audio layers', 'equalizer', 'DAW', 'Pro Tools', 'Audacity',
+      'Ableton', 'soundscape', 'soundtrack', 'noise reduction', 'studio audio'
     ];
 
     let currentUserEmail = "";
@@ -204,7 +204,7 @@
     });
 
     function loadPosts() {
-      db.collection("marketer")
+      db.collection("sfx")
         .orderBy("timestamp", "desc")
         .onSnapshot((snapshot) => {
           const postsContainer = document.getElementById("posts-container");
@@ -313,7 +313,7 @@
 
       const postContent = `${title}: ${desc}`;
 
-      await db.collection("marketer").add({
+      await db.collection("sfx").add({
         content: postContent,
         userEmail: user.email,
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
@@ -324,7 +324,7 @@
     }
 
     async function deletePost(postId) {
-      await db.collection("marketer").doc(postId).delete();
+      await db.collection("sfx").doc(postId).delete();
     }
 
     function openUpdateModal(postId, content) {
@@ -340,7 +340,7 @@
     async function submitUpdate() {
       const newContent = document.getElementById("update-content").value.trim();
       if (!newContent) return;
-      await db.collection("marketer").doc(currentUpdatePostId).update({
+      await db.collection("sfx").doc(currentUpdatePostId).update({
         content: newContent,
       });
       closeUpdateModal();
