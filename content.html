@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GigNest</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #141414;
+        color: white;
+        display: flex;
+      }
+      .sidebar {
+        width: 250px;
+        background-color: #1e1e1e;
+        height: 100vh;
+        padding: 20px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .sidebar h3 {
+        margin-bottom: 15px;
+      }
+      .sidebar-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .sidebar-btn {
+        background-color: #2c2c2c;
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        text-align: left;
+        font-size: 16px;
+        width: 100%;
+        transition: all 0.3s;
+      }
+      .sidebar-btn:hover {
+        background-color: #3a3a3a;
+      }
+      .user-info {
+        font-size: 14px;
+        background-color: #222;
+        padding: 10px;
+        border-radius: 5px;
+      }
+      .container {
+        margin-left: 250px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        padding: 80px 20px 80px 20px;
+        position: relative;
+      }
+      .header {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+      .welcome {
+        font-size: 28px;
+        font-weight: bold;
+      }
+      .logout-btn {
+        background-color: #fff;
+        color: #141414;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        position: absolute;
+        top: 20px;
+        right: 20px;
+      }
+      .create-btn {
+        position: fixed;
+        bottom: 20px;
+        left: 250px;
+        right: 20px;
+        width: calc(100% - 250px - 40px);
+        padding: 15px 0;
+        background-color: #00b894;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 18px;
+        cursor: pointer;
+        z-index: 999;
+      }
+      .create-btn:hover {
+        background-color: #019175;
+      }
+      #posts-container {
+        width: 100%;
+        max-width: 700px;
+        margin: 0 auto;
+      }
+      .post {
+        background-color: #222;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+      }
+      .post-title {
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 8px;
+      }
+      .post-desc {
+        font-size: 16px;
+      }
+      .post .actions {
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+      }
+      .post .delete-btn {
+        background-color: #00b894;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .post .edit-btn {
+        background-color: #00b894;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      /* Modal styles */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+      .modal-content {
+        background: #1e1e1e;
+        padding: 30px;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 500px;
+        color: white;
+        position: relative;
+      }
+      .modal-content input,
+      .modal-content textarea {
+        width: 100%;
+        padding: 10px;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        border: none;
+        background: #333;
+        color: white;
+      }
+      .modal-content button {
+        background-color: #00b894;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .close-modal {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 18px;
+        cursor: pointer;
+        color: #aaa;
+      }
+      .post p strong {
+        position: relative;
+        top: -10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sidebar">
+      <div>
+        <h3>Categories</h3>
+        <div class="sidebar-buttons">
+          <button class="sidebar-btn" onclick="navigateTo('Graphic')">Graphic Designer</button>
+          <button class="sidebar-btn" onclick="navigateTo('Video')">Video Editor</button>
+          <button class="sidebar-btn" onclick="navigateTo('main')">Web Developer</button>
+          <button class="sidebar-btn" onclick="navigateTo('Content')">Content Writer</button>
+          <button class="sidebar-btn" onclick="navigateTo('Marketer')">Marketer</button>
+        </div>
+      </div>
+      <div class="user-info">Email: <span id="user-email"></span></div>
+    </div>
+
+    <div class="container">
+      <div class="header">
+        <div class="welcome">Welcome to GigNest</div>
+      </div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+      <div id="posts-container"></div>
+      <button class="create-btn" onclick="openModal()">Create New Gig</button>
+    </div>
+
+    <!-- Create Post Modal -->
+    <div class="modal" id="modal">
+      <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <h2>Create Gig</h2>
+        <input type="text" id="project-title" placeholder="Project Title" />
+        <textarea
+          id="project-desc"
+          rows="4"
+          placeholder="Project Description"
+        ></textarea>
+        <button onclick="submitProject()">Submit</button>
+      </div>
+    </div>
+
+    <!-- Update Post Modal -->
+    <div class="modal" id="update-modal">
+      <div class="modal-content">
+        <span class="close-modal" onclick="closeUpdateModal()">&times;</span>
+        <h2>Update Gig</h2>
+        <textarea id="update-content" rows="4"></textarea>
+        <button onclick="submitUpdate()">Update</button>
+      </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyDavL0RmMLSDvwwdEzHwuRx8LEA7u-Rk3M",
+        authDomain: "project-lvl3.firebaseapp.com",
+        projectId: "project-lvl3",
+        storageBucket: "project-lvl3.appspot.com",
+        messagingSenderId: "202554438946",
+        appId: "1:202554438946:web:dca6ebd6d5b683fe45e17b",
+        measurementId: "G-HLMM73VTVY",
+      };
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const db = firebase.firestore();
+
+      let currentUserEmail = "";
+      let currentUpdatePostId = "";
+
+      // Navigation function for sidebar buttons
+      function navigateTo(category) {
+        window.location.href = `${category.toLowerCase()}.html`;
+      }
+
+      auth.onAuthStateChanged(async (user) => {
+        if (user) {
+          currentUserEmail = user.email;
+          document.getElementById("user-email").textContent = user.email;
+          loadPosts();
+        } else {
+          window.location.href = "index.html";
+        }
+      });
+
+      function loadPosts() {
+        db.collection("content")
+          .orderBy("timestamp", "desc")
+          .onSnapshot((snapshot) => {
+            const postsContainer = document.getElementById("posts-container");
+            postsContainer.innerHTML = "";
+
+            snapshot.forEach((doc) => {
+              const post = doc.data();
+              const [title, ...descParts] = post.content.split(":");
+              const desc = descParts.join(":").trim();
+
+              const postElement = document.createElement("div");
+              postElement.className = "post";
+
+              let actionsHTML = "";
+              if (post.userEmail === currentUserEmail) {
+                actionsHTML = `
+                  <div class="actions">
+                    <button class="delete-btn" onclick="deletePost('${
+                      doc.id
+                    }')">Delete</button>
+                    <button class="edit-btn" onclick="openUpdateModal('${
+                      doc.id
+                    }', \`${post.content.replace(
+                  /`/g,
+                  "\\`"
+                )}\`)">Update</button>
+                  </div>
+                `;
+              }
+
+              postElement.innerHTML = `
+                <p><strong>${post.userEmail}</strong></p>
+                <div class="post-title">${title}</div>
+                <div class="post-desc">${desc}</div>
+                ${actionsHTML}
+              `;
+              postsContainer.appendChild(postElement);
+            });
+          });
+      }
+
+      function openModal() {
+        document.getElementById("modal").style.display = "flex";
+      }
+
+      function closeModal() {
+        document.getElementById("modal").style.display = "none";
+      }
+
+      async function submitProject() {
+        const title = document.getElementById("project-title").value.trim();
+        const desc = document.getElementById("project-desc").value.trim();
+
+        if (!title || !desc) {
+          alert("Please fill in all fields");
+          return;
+        }
+
+        const user = auth.currentUser;
+        if (!user) return;
+
+        const postContent = `${title}: ${desc}`;
+
+        await db.collection("content").add({
+          content: postContent,
+          userEmail: user.email,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+
+        closeModal();
+        document.getElementById("project-title").value = "";
+        document.getElementById("project-desc").value = "";
+      }
+
+      async function deletePost(postId) {
+        await db.collection("content").doc(postId).delete();
+      }
+
+      function openUpdateModal(postId, content) {
+        currentUpdatePostId = postId;
+        document.getElementById("update-content").value = content;
+        document.getElementById("update-modal").style.display = "flex";
+      }
+
+      function closeUpdateModal() {
+        document.getElementById("update-modal").style.display = "none";
+      }
+
+      async function submitUpdate() {
+        const newContent = document
+          .getElementById("update-content")
+          .value.trim();
+        if (!newContent) return;
+        await db.collection("content").doc(currentUpdatePostId).update({
+          content: newContent,
+        });
+        closeUpdateModal();
+      }
+
+      function logout() {
+        auth.signOut().then(() => {
+          window.location.href = "index.html";
+        });
+      }
+    </script>
+  </body>
+</html>
